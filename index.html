@@ -7,375 +7,68 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #080808;
-      --fg: #f0ede8;
-      --muted: #555;
-      --accent: #f0ede8;
-      --border: #1c1c1c;
-    }
-
+    :root { --bg: #080808; --fg: #f0ede8; --muted: #555; --accent: #f0ede8; --border: #1c1c1c; }
     html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: 'DM Mono', monospace;
-      font-size: 14px;
-      line-height: 1.7;
-      min-height: 100vh;
-      cursor: crosshair;
-    }
-
+    body { background: var(--bg); color: var(--fg); font-family: 'DM Mono', monospace; font-size: 14px; line-height: 1.7; min-height: 100vh; cursor: crosshair; }
     ::selection { background: var(--fg); color: var(--bg); }
-
-    /* NAV */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem 3rem;
-      border-bottom: 1px solid var(--border);
-      background: rgba(8,8,8,0.92);
-      backdrop-filter: blur(8px);
-    }
-
-    .nav-logo {
-      font-family: 'Syne', sans-serif;
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--fg);
-      text-decoration: none;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2.5rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
-
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 3rem; border-bottom: 1px solid var(--border); background: rgba(8,8,8,0.92); backdrop-filter: blur(8px); }
+    .nav-logo { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--fg); text-decoration: none; }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
     .nav-links a:hover { color: var(--fg); }
-
-    /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 3rem;
-      padding-top: 8rem;
-      border-bottom: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-eyebrow {
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 2rem;
-    }
-
-    .hero-name {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(3.5rem, 10vw, 9rem);
-      font-weight: 800;
-      line-height: 0.9;
-      letter-spacing: -0.03em;
-      text-transform: uppercase;
-      margin-bottom: 3rem;
-    }
-
-    .hero-name span {
-      display: block;
-      color: transparent;
-      -webkit-text-stroke: 1px var(--fg);
-    }
-
-    .hero-desc {
-      max-width: 480px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.9;
-      margin-bottom: 3rem;
-    }
-
-    .hero-desc em {
-      color: var(--fg);
-      font-style: normal;
-    }
-
-    .hero-scroll {
-      position: absolute;
-      right: 3rem;
-      bottom: 3rem;
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .hero-scroll::before {
-      content: '';
-      display: block;
-      width: 1px;
-      height: 60px;
-      background: var(--muted);
-    }
-
-    /* BIG NUMBER */
-    .big-number {
-      position: absolute;
-      top: 50%;
-      right: -2rem;
-      transform: translateY(-50%);
-      font-family: 'Syne', sans-serif;
-      font-size: 28vw;
-      font-weight: 800;
-      color: #0f0f0f;
-      line-height: 1;
-      pointer-events: none;
-      user-select: none;
-      letter-spacing: -0.05em;
-    }
-
-    /* ABOUT */
-    .about {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .about-left {
-      padding: 4rem 3rem;
-      border-right: 1px solid var(--border);
-    }
-
-    .section-label {
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0.5rem;
-    }
-
-    .section-number {
-      font-family: 'Syne', sans-serif;
-      font-size: 4rem;
-      font-weight: 800;
-      color: var(--border);
-      line-height: 1;
-    }
-
-    .about-right {
-      padding: 4rem 3rem;
-    }
-
-    .about-heading {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(1.5rem, 3vw, 2.5rem);
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 2rem;
-    }
-
-    .about-text {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 2;
-      max-width: 520px;
-    }
-
-    .about-text strong {
-      color: var(--fg);
-      font-weight: 400;
-    }
-
-    /* INTERESTS */
-    .interests {
-      border-bottom: 1px solid var(--border);
-      padding: 4rem 3rem;
-    }
-
-    .interests-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 0;
-      margin-top: 3rem;
-      border: 1px solid var(--border);
-    }
-
-    .interest-item {
-      padding: 2.5rem 2rem;
-      border-right: 1px solid var(--border);
-      transition: background 0.2s;
-      cursor: default;
-    }
-
+    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 3rem; padding-top: 8rem; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+    .hero-eyebrow { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 2rem; }
+    .hero-name { font-family: 'Syne', sans-serif; font-size: clamp(3.5rem, 10vw, 9rem); font-weight: 800; line-height: 0.9; letter-spacing: -0.03em; text-transform: uppercase; margin-bottom: 3rem; }
+    .hero-name span { display: block; color: transparent; -webkit-text-stroke: 1px var(--fg); }
+    .hero-desc { max-width: 480px; color: var(--muted); font-size: 13px; line-height: 1.9; margin-bottom: 3rem; }
+    .hero-desc em { color: var(--fg); font-style: normal; }
+    .hero-scroll { position: absolute; right: 3rem; bottom: 3rem; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); writing-mode: vertical-rl; text-orientation: mixed; display: flex; align-items: center; gap: 1rem; }
+    .hero-scroll::before { content: ''; display: block; width: 1px; height: 60px; background: var(--muted); }
+    .big-number { position: absolute; top: 50%; right: -2rem; transform: translateY(-50%); font-family: 'Syne', sans-serif; font-size: 28vw; font-weight: 800; color: #0f0f0f; line-height: 1; pointer-events: none; user-select: none; letter-spacing: -0.05em; }
+    .about { display: grid; grid-template-columns: 1fr 2fr; gap: 0; border-bottom: 1px solid var(--border); }
+    .about-left { padding: 4rem 3rem; border-right: 1px solid var(--border); }
+    .section-label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .section-number { font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800; color: var(--border); line-height: 1; }
+    .about-right { padding: 4rem 3rem; }
+    .about-heading { font-family: 'Syne', sans-serif; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 700; line-height: 1.2; margin-bottom: 2rem; }
+    .about-text { color: var(--muted); font-size: 13px; line-height: 2; max-width: 520px; }
+    .about-text strong { color: var(--fg); font-weight: 400; }
+    .interests { border-bottom: 1px solid var(--border); padding: 4rem 3rem; }
+    .interests-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; margin-top: 3rem; border: 1px solid var(--border); }
+    .interest-item { padding: 2.5rem 2rem; border-right: 1px solid var(--border); transition: background 0.2s; cursor: default; }
     .interest-item:last-child { border-right: none; }
-
     .interest-item:hover { background: #0f0f0f; }
-
-    .interest-num {
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      color: var(--muted);
-      margin-bottom: 1.5rem;
-    }
-
-    .interest-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-    }
-
-    .interest-desc {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.8;
-    }
-
-    /* CONTACT */
-    .contact {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      min-height: 60vh;
-    }
-
-    .contact-left {
-      padding: 4rem 3rem;
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .contact-heading {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(2rem, 4vw, 4rem);
-      font-weight: 800;
-      line-height: 1.1;
-      text-transform: uppercase;
-    }
-
-    .contact-links {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      margin-top: 3rem;
-    }
-
-    .contact-link {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.25rem 0;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 13px;
-      letter-spacing: 0.05em;
-      transition: color 0.2s;
-      group: true;
-    }
-
+    .interest-num { font-size: 11px; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 1.5rem; }
+    .interest-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem; }
+    .interest-desc { font-size: 12px; color: var(--muted); line-height: 1.8; }
+    .contact { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 60vh; border-bottom: 1px solid var(--border); }
+    .contact-left { padding: 4rem 3rem; border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; }
+    .contact-heading { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 4rem); font-weight: 800; line-height: 1.1; text-transform: uppercase; }
+    .contact-links { display: flex; flex-direction: column; gap: 1px; margin-top: 3rem; }
+    .contact-link { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 0; border-top: 1px solid var(--border); color: var(--muted); text-decoration: none; font-size: 13px; letter-spacing: 0.05em; transition: color 0.2s; }
     .contact-link:hover { color: var(--fg); }
-
-    .contact-link-arrow {
-      font-size: 18px;
-      transition: transform 0.2s;
-    }
-
+    .contact-link-arrow { font-size: 18px; transition: transform 0.2s; }
     .contact-link:hover .contact-link-arrow { transform: translate(4px, -4px); }
-
-    .contact-right {
-      padding: 4rem 3rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-
-    .contact-status {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 2rem;
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #4ade80;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    .contact-note {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 2;
-      max-width: 320px;
-    }
-
-    /* FOOTER */
-    footer {
-      padding: 2rem 3rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    /* ANIMATIONS */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
+    .contact-right { padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: flex-end; }
+    .contact-status { display: flex; align-items: center; gap: 0.75rem; font-size: 12px; color: var(--muted); margin-bottom: 2rem; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .contact-note { font-size: 13px; color: var(--muted); line-height: 2; max-width: 320px; }
+    .game-section { border-bottom: 1px solid var(--border); }
+    .game-inner { display: grid; grid-template-columns: 1fr 2fr; gap: 0; }
+    .game-left { padding: 4rem 3rem; border-right: 1px solid var(--border); }
+    .game-right { padding: 4rem 3rem; }
+    .game-btn { display: inline-block; margin-top: 2rem; padding: 0.75rem 2rem; border: 1px solid var(--muted); color: var(--fg); text-decoration: none; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
+    .game-btn:hover { background: var(--fg); color: var(--bg); }
+    footer { padding: 2rem 3rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     .hero-eyebrow { animation: fadeUp 0.6s ease 0.1s both; }
     .hero-name    { animation: fadeUp 0.6s ease 0.2s both; }
     .hero-desc    { animation: fadeUp 0.6s ease 0.35s both; }
     .hero-scroll  { animation: fadeUp 0.6s ease 0.5s both; }
-
-    /* MOBILE */
     @media (max-width: 768px) {
       nav { padding: 1.25rem 1.5rem; }
-      .nav-links { gap: 1.5rem; }
+      .nav-links { gap: 1.2rem; }
       .hero { padding: 1.5rem; padding-top: 6rem; }
       .hero-scroll { display: none; }
       .about { grid-template-columns: 1fr; }
@@ -387,6 +80,9 @@
       .contact { grid-template-columns: 1fr; }
       .contact-left { border-right: none; border-bottom: 1px solid var(--border); padding: 2.5rem 1.5rem; }
       .contact-right { padding: 2.5rem 1.5rem; }
+      .game-inner { grid-template-columns: 1fr; }
+      .game-left { border-right: none; border-bottom: 1px solid var(--border); padding: 2.5rem 1.5rem; }
+      .game-right { padding: 2.5rem 1.5rem; }
       footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem; }
     }
   </style>
@@ -399,24 +95,18 @@
       <li><a href="#about">About</a></li>
       <li><a href="#interests">Interests</a></li>
       <li><a href="#contact">Contact</a></li>
+      <li><a href="#game">Game</a></li>
     </ul>
   </nav>
 
-  <!-- HERO -->
   <section class="hero">
     <div class="big-number">TY</div>
     <p class="hero-eyebrow">Based in Pakistan &nbsp;—&nbsp; Est. 2000s</p>
-    <h1 class="hero-name">
-      Taha<span>Yasin</span>
-    </h1>
-    <p class="hero-desc">
-      A <em>curious mind</em> exploring the world one interest at a time.
-      Still figuring things out — and that's exactly the point.
-    </p>
+    <h1 class="hero-name">Taha<span>Yasin</span></h1>
+    <p class="hero-desc">A <em>curious mind</em> exploring the world one interest at a time. Still figuring things out — and that's exactly the point.</p>
     <div class="hero-scroll">Scroll</div>
   </section>
 
-  <!-- ABOUT -->
   <section class="about" id="about">
     <div class="about-left">
       <p class="section-label">About</p>
@@ -424,18 +114,10 @@
     </div>
     <div class="about-right">
       <h2 class="about-heading">Not defined by<br/>a single thing.</h2>
-      <p class="about-text">
-        Hi, I'm Taha. I'm someone who gets <strong>genuinely excited</strong> about
-        a lot of different things — tech, ideas, people, and the random corners
-        of the internet that make you think.<br/><br/>
-        I haven't picked one lane yet, and honestly, I'm <strong>okay with that</strong>.
-        I think curiosity is a skill in itself. Right now I'm just exploring,
-        learning, and seeing where things lead.
-      </p>
+      <p class="about-text">Hi, I'm Taha. I'm someone who gets <strong>genuinely excited</strong> about a lot of different things — tech, ideas, people, and the random corners of the internet that make you think.<br/><br/>I haven't picked one lane yet, and honestly, I'm <strong>okay with that</strong>. I think curiosity is a skill in itself. Right now I'm just exploring, learning, and seeing where things lead.</p>
     </div>
   </section>
 
-  <!-- INTERESTS -->
   <section class="interests" id="interests">
     <p class="section-label">What I'm into</p>
     <div class="interests-grid">
@@ -462,7 +144,6 @@
     </div>
   </section>
 
-  <!-- CONTACT -->
   <section class="contact" id="contact">
     <div class="contact-left">
       <div>
@@ -485,11 +166,21 @@
         <div class="status-dot"></div>
         <span>Open to conversations</span>
       </div>
-      <p class="contact-note">
-        Whether you've got an interesting idea, a random thought,
-        or just want to say hi — my inbox is open.
-        I reply to everyone.
-      </p>
+      <p class="contact-note">Whether you've got an interesting idea, a random thought, or just want to say hi — my inbox is open. I reply to everyone.</p>
+    </div>
+  </section>
+
+  <section class="game-section" id="game">
+    <div class="game-inner">
+      <div class="game-left">
+        <p class="section-label">Game</p>
+        <p class="section-number">04</p>
+      </div>
+      <div class="game-right">
+        <h2 class="about-heading">PAF J-10C<br/>vs IAF Rafale</h2>
+        <p class="about-text">A 2D air combat game. Fly the <strong>PAF Vigorous Dragon</strong> against IAF Rafales. Fire PL-15 BVR missiles. Avoid MICA. Stay alive.</p>
+        <a href="paf-game.html" class="game-btn">Play Now →</a>
+      </div>
     </div>
   </section>
 
