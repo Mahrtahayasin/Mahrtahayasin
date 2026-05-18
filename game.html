@@ -170,9 +170,46 @@ function gameLoop() {
     ctx.fillText('Press SPACE to scramble',W/2,H/2+10);
     ctx.fillStyle='#ffcc00'; ctx.font='11px monospace';
     ctx.fillText('PL-15 BVR MISSILE COMBAT',W/2,H/2+35);
-    drawJ10C(W/2-80, H/2+80, 0);
-    drawRafale(W/2+80, H/2+80, Math.PI);
-    drawAWACS(W/2, H/2+80-60);
+   // === LOAD IMAGES ONCE ===
+const imgJ10 = new Image();
+imgJ10.src = "Gemini_Generated_Image_w12xtuw12xtuw12x.png";
+
+const imgRafale = new Image();
+imgRafale.src = "Gemini_Generated_Image_rf1qpwrf1qpwrf1q.png";
+
+const imgAWACS = new Image();
+imgAWACS.src = "Gemini_Generated_Image_fee3uvfee3uvfee3.png";
+
+function drawJ10C(cx, cy, ang) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(ang);
+  ctx.drawImage(imgJ10, -32, -20, 64, 40);
+  ctx.restore();
+}
+
+function drawRafale(cx, cy, ang) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(ang);
+  ctx.drawImage(imgRafale, -34, -20, 68, 40);
+  ctx.restore();
+}
+
+function drawAWACS(cx, cy) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.drawImage(imgAWACS, -60, -30, 120, 60);
+
+  // keep radar ring effect
+  ctx.fillStyle='rgba(100,200,100,0.15)';
+  let r=80+Math.sin(frame*0.05)*10;
+  ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(100,200,100,0.4)'; ctx.lineWidth=0.5;
+  ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.stroke();
+
+  ctx.restore();
+}
     requestAnimationFrame(gameLoop); return;
   }
 
