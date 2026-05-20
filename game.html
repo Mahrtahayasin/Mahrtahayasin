@@ -333,7 +333,8 @@
             radius: 100,
             aircraft: [],
             running: false,
-            updateInterval: null
+            updateInterval: null,
+            sweepAngle: 0
         };
 
         const EARTH_RADIUS_KM = 6371;
@@ -400,6 +401,34 @@
                 ctx.stroke();
             }
 
+            // Draw rotating sweep line (like real radar)
+            const sweepRad = (radarData.sweepAngle * Math.PI) / 180;
+            const sweepEndX = centerX + Math.cos(sweepRad) * maxRadius;
+            const sweepEndY = centerY + Math.sin(sweepRad) * maxRadius;
+
+            // Create gradient for sweep line
+            const gradient = ctx.createLinearGradient(centerX, centerY, sweepEndX, sweepEndY);
+            gradient.addColorStop(0, 'rgba(0, 255, 0, 0)');
+            gradient.addColorStop(0.7, 'rgba(0, 255, 0, 0.4)');
+            gradient.addColorStop(1, 'rgba(0, 255, 0, 0.8)');
+
+            // Draw sweep line
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(sweepEndX, sweepEndY);
+            ctx.stroke();
+
+            // Draw sweep glow
+            ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)';
+            ctx.lineWidth = 15;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(sweepEndX, sweepEndY);
+            ctx.stroke();
+
             // Draw cardinal directions
             ctx.fillStyle = '#0ff';
             ctx.font = 'bold 14px Arial';
@@ -438,27 +467,87 @@
                     const x = centerX + plotRadius * Math.cos(angle);
                     const y = centerY + plotRadius * Math.sin(angle);
 
-                    // Draw aircraft blip
-                    ctx.fillStyle = '#0f0';
+                    // Check if sweep line is passing this aircraft (within 5 degrees)
+                    const sweepAngleDiff = Math.abs(radarData.sweepAngle - bearing);
+                    const normalizedDiff = Math.min(sweepAngleDiff, 360 - sweepAngleDiff);
+                    const isBeingScanned = normalizedDiff < 8;
+
+                    // Highlight aircraft being scanned by sweep
+                    if (isBeingScanned) {
+                        ctx.fillStyle = '#ffff00';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 8, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // Bright yellow glow
+                        ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 10, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+
+                    // Draw heading arrow (direction of travel)
+                    const headingRad = (aircraft.track * Math.PI) / 180;
+                    const arrowLength = 20;
+                    const arrowEndX = x + arrowLength * Math.cos(headingRad);
+                    const arrowEndY = y + arrowLength * Math.sin(headingRad);
+
+                    ctx.strokeStyle = isBeingScanned ? 'rgba(255, 255, 0, 0.8)' : 'rgba(0, 255, 0, 0.6)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(arrowEndX, arrowEndY);
+                    ctx.stroke();
+
+                    // Draw arrow head
+                    const arrowHeadSize = 6;
+                    const angle1 = headingRad + (Math.PI * 7) / 12;
+                    const angle2 = headingRad - (Math.PI * 7) / 12;
+                    ctx.fillStyle = isBeingScanned ? 'rgba(255, 255, 0, 0.8)' : 'rgba(0, 255, 0, 0.8)';
+                    ctx.beginPath();
+                    ctx.moveTo(arrowEndX, arrowEndY);
+                    ctx.lineTo(arrowEndX - arrowHeadSize * Math.cos(angle1), arrowEndY - arrowHeadSize * Math.sin(angle1));
+                    ctx.lineTo(arrowEndX - arrowHeadSize * Math.cos(angle2), arrowEndY - arrowHeadSize * Math.sin(angle2));
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Draw aircraft blip with beep pulse animation
+                    const beepPulse = (Date.now() % 1000) / 1000;
+                    const pulseRadius = 5 + beepPulse * 3;
+
+                    ctx.fillStyle = isBeingScanned ? '#ffff00' : '#0f0';
                     ctx.beginPath();
                     ctx.arc(x, y, 5, 0, Math.PI * 2);
                     ctx.fill();
 
+                    // Draw expanding beep ring
+                    ctx.strokeStyle = isBeingScanned ? `rgba(255, 255, 0, ${1 - beepPulse})` : `rgba(0, 255, 0, ${1 - beepPulse})`;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(x, y, pulseRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+
                     // Draw glow effect
-                    ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+                    ctx.fillStyle = isBeingScanned ? 'rgba(255, 255, 0, 0.3)' : 'rgba(0, 255, 0, 0.3)';
                     ctx.beginPath();
                     ctx.arc(x, y, 8, 0, Math.PI * 2);
                     ctx.fill();
 
                     // Draw tail number
-                    ctx.fillStyle = '#0ff';
+                    ctx.fillStyle = isBeingScanned ? '#ffff00' : '#0ff';
                     ctx.font = 'bold 11px monospace';
                     ctx.textAlign = 'left';
                     ctx.fillText(aircraft.callsign || 'N/A', x + 10, y - 5);
 
+                    // Draw heading angle
+                    ctx.fillStyle = isBeingScanned ? 'rgba(255, 255, 0, 0.8)' : 'rgba(0, 255, 0, 0.8)';
+                    ctx.font = '9px monospace';
+                    ctx.fillText(`${aircraft.track.toFixed(0)}°`, x + 10, y + 20);
+
                     // Draw altitude
                     if (aircraft.altitude > 0) {
-                        ctx.fillStyle = 'rgba(0, 255, 255, 0.7)';
+                        ctx.fillStyle = isBeingScanned ? 'rgba(255, 255, 0, 0.7)' : 'rgba(0, 255, 255, 0.7)';
                         ctx.font = '10px monospace';
                         ctx.fillText(`${(aircraft.altitude * 3.28084).toFixed(0)}ft`, x + 10, y + 8);
                     }
@@ -491,50 +580,34 @@
 
         async function fetchAircraftData() {
             try {
+                // Use demo data by default for better visibility
                 const lat = parseFloat(document.getElementById('latitude').value);
                 const lon = parseFloat(document.getElementById('longitude').value);
                 const radius = radarData.radius;
 
-                // OpenSky Network API - bounding box format
-                const lamin = lat - (radius / EARTH_RADIUS_KM) * (180 / Math.PI);
-                const lamax = lat + (radius / EARTH_RADIUS_KM) * (180 / Math.PI);
-                const lonmin = lon - (radius / EARTH_RADIUS_KM) * (180 / Math.PI) / Math.cos((lat * Math.PI) / 180);
-                const lonmax = lon + (radius / EARTH_RADIUS_KM) * (180 / Math.PI) / Math.cos((lat * Math.PI) / 180);
-
-                const url = `https://opensky-network.org/api/states/all?lamin=${lamin}&lomax=${lonmax}&lamax=${lamax}&lomin=${lonmin}`;
-
-                const response = await fetch(url);
-                const data = await response.json();
+                // Demo aircraft near the center location
+                const demoAircraft = [
+                    { callsign: 'AAL101', latitude: lat + 0.3, longitude: lon + 0.2, altitude: 35000, velocity: 460, track: 45, icao24: 'abc001' },
+                    { callsign: 'UAL456', latitude: lat - 0.25, longitude: lon + 0.3, altitude: 28000, velocity: 420, track: 135, icao24: 'abc002' },
+                    { callsign: 'DAL789', latitude: lat + 0.15, longitude: lon - 0.35, altitude: 22000, velocity: 380, track: 225, icao24: 'abc003' },
+                    { callsign: 'SWA123', latitude: lat - 0.2, longitude: lon - 0.15, altitude: 15000, velocity: 320, track: 315, icao24: 'abc004' },
+                    { callsign: 'N12345', latitude: lat + 0.4, longitude: lon + 0.4, altitude: 8000, velocity: 180, track: 90, icao24: 'abc005' },
+                    { callsign: 'N67890', latitude: lat - 0.35, longitude: lon + 0.35, altitude: 5000, velocity: 150, track: 180, icao24: 'abc006' },
+                ];
 
                 radarData.latitude = lat;
                 radarData.longitude = lon;
+                radarData.aircraft = demoAircraft.filter(aircraft => {
+                    const distance = calculateDistance(lat, lon, aircraft.latitude, aircraft.longitude);
+                    const altFilter = parseInt(document.getElementById('altitude').value) || 0;
+                    return distance <= radius && aircraft.altitude >= altFilter;
+                });
 
-                if (data.states && Array.isArray(data.states)) {
-                    radarData.aircraft = data.states
-                        .filter(state => state[5] !== null && state[6] !== null) // Must have lat/lon
-                        .map(state => ({
-                            callsign: (state[1] || 'N/A').trim(),
-                            latitude: state[5],
-                            longitude: state[6],
-                            altitude: state[13] || 0,
-                            velocity: state[9] || 0,
-                            track: state[10] || 0,
-                            verticalRate: state[11] || 0,
-                            icao24: state[0]
-                        }))
-                        .filter(aircraft => {
-                            const altFilter = parseInt(document.getElementById('altitude').value) || 0;
-                            return aircraft.altitude >= altFilter;
-                        });
-
-                    updateStatus(`✓ ${radarData.aircraft.length} aircraft detected`, false, true);
-                    updateAircraftList();
-                } else {
-                    updateStatus('✗ No aircraft data received', true);
-                }
+                updateStatus(`✓ ${radarData.aircraft.length} aircraft detected (Demo Mode)`, false, true);
+                updateAircraftList();
             } catch (error) {
                 updateStatus('✗ Error: ' + error.message, true);
-                console.error('Fetch error:', error);
+                console.error('Error:', error);
             }
         }
 
@@ -554,7 +627,7 @@
                     aircraft.longitude
                 );
                 const altitude = (aircraft.altitude * 3.28084).toFixed(0);
-                const velocity = (aircraft.velocity * 1.94384).toFixed(0); // m/s to knots
+                const velocity = (aircraft.velocity * 1.94384).toFixed(0);
 
                 return `
                     <div class="aircraft-item">
@@ -578,9 +651,10 @@
             updateStatus('🔴 RADAR ACTIVE - Scanning...', false, true);
             
             fetchAircraftData();
-            radarData.updateInterval = setInterval(fetchAircraftData, 1000); // Update every 1 second
+            radarData.updateInterval = setInterval(fetchAircraftData, 1000);
             
             const animateRadar = () => {
+                radarData.sweepAngle = (radarData.sweepAngle + 2.25) % 360;
                 drawRadar();
                 if (radarData.running) {
                     requestAnimationFrame(animateRadar);
@@ -596,9 +670,7 @@
             drawRadar();
         }
 
-        // Initial draw
         drawRadar();
     </script>
 </body>
 </html>
-
